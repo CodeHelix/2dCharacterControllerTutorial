@@ -12,6 +12,9 @@ public class PlayerControlerScript : MonoBehaviour
     public Transform groundCheck;
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
+    public float jumpForce = 700;
+
+    bool doubleJump = false;
 
 	// Use this for initialization
 	void Start () 
@@ -24,6 +27,11 @@ public class PlayerControlerScript : MonoBehaviour
     {
         grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
         anim.SetBool("Ground", grounded);
+
+        if (grounded)
+            doubleJump = false;
+
+        anim.SetFloat("vSpeed", rigidbody2D.velocity.y);
 
         float move = Input.GetAxis("Horizontal");
 
@@ -40,6 +48,18 @@ public class PlayerControlerScript : MonoBehaviour
             Flip();
         }
 	}
+
+    void Update()
+    {
+        if ((grounded || !doubleJump) && Input.GetKeyDown(KeyCode.Space))
+        {
+            anim.SetBool("Ground", false);
+            rigidbody2D.AddForce(new Vector2(0, jumpForce));
+
+            if (!doubleJump && !grounded)
+                doubleJump = true;
+        }
+    }
 
     void Flip()
     {
